@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const ExpressError = require("./ExpressError");
+
 
 
 //middleware --> pehle hi response send kar deta hai
@@ -27,11 +29,11 @@ app.use("/api", (req, res, next) => {
     if (token === "giveaccess") {
         next();
     }
-    res.send("ACCESS DENIED!");
+    throw new ExpressError(401, "ACCESS DENIED!");
 });
 
 // ACTIVITY :- API TOKEN AS QUERY STRING :- uper jab access milega api ko ussi ke baad data milega warna nhi 
-app.get("/api", (req, res) => {
+app.get("/api", checkToken, (req, res) => {
     res.send("data");
 });
 //..............................................................................................................................
@@ -56,6 +58,30 @@ app.get("/", (req, res) => {
 app.get("/random", (req, res) => {
     res.send("this is a random page");
 });
+
+//..............Error Handling............................................
+// We can handle error by creating our own error handling middlewares
+
+app.get("/err", (req, res) => {
+    abcd = abcd;
+});
+
+app.use((err, req, res, next) => {
+    console.log("------ERROR-------");
+    next(err);
+});
+
+app.use((err, req, res, next) => {
+    console.log("-------ERROR2 Middleware---------")
+});
+
+//.........................................................................
+app.use((req, res) => {
+    res.status(404).send("Page not found!");
+});
+
+
+
 
 app.listen(8080, () => {
     console.log("Server listening on port 8080");
